@@ -14,7 +14,7 @@
                 "main.c",
                 "-o", "main.exe",
                 "-lraylib", // se deve colocar libraylib.dll en la carpeta del proyecto
-                "-lopengl32",
+                "-lopengl32", //( se copia desde  /mingw64/bin/libraylib.dll)
                 "-lgdi32",
                 "-lwinmm",
                 "-mwindows" // para que no abra la consola
