@@ -13,9 +13,9 @@
                 "-L", "C:/msys64/mingw64/lib",
                 "main.c",
                 "-o", "main.exe",
-                "-lraylib", // se deve colocar libraylib.dll en la carpeta del proyecto
-                "-lopengl32", //( se copia desde  /mingw64/bin/libraylib.dll)
-                "-lgdi32",
+                "-lraylib",     // se deve colocar libraylib.dll en la carpeta del proyecto
+                "-lopengl32",   //(se busca con  pacman -Ql mingw-w64-x86_64-raylib | grep dll )
+                "-lgdi32",      
                 "-lwinmm",
                 "-mwindows" // para que no abra la consola
             ],
