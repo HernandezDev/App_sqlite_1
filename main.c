@@ -1,5 +1,7 @@
 #include<stdio.h>
 #include<raylib.h>
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
 
 int main(void)
 {
@@ -10,16 +12,24 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "Ejemplo de ventana con raylib");
 
     SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
+    bool showMessageBox = false;
 
-    // Main game loop
-    while (!WindowShouldClose())  // Detect window close button or ESC key
+    while (!WindowShouldClose())
     {
         // Draw
+        //----------------------------------------------------------------------------------
         BeginDrawing();
+            ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
-        ClearBackground(RAYWHITE);
+            if (GuiButton((Rectangle){ 24, 24, 120, 30 }, "#191#Show Message")) showMessageBox = true;
 
-        DrawText("Hola soy una ventana re fachera!", 190, 200, 20, BLACK);
+            if (showMessageBox)
+            {
+                int result = GuiMessageBox((Rectangle){ 85, 70, 250, 100 },
+                    "#191#Message Box", "Hi! This is a message!", "Nice;Cool");
+
+                if (result >= 0) showMessageBox = false;
+            }
 
         EndDrawing();
     }
