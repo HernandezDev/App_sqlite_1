@@ -55,7 +55,7 @@ int main() {
             GuiTextBox((Rectangle){90, 80, 200, 40}, InputNombreArticulo, 50, EditInputNombreArticulo);
 
             // Usar GuiValueBoxFloat para manejar valores flotantes
-            GuiValueBoxFloat((Rectangle){90, 130, 200, 40}, "Precio", InputPrecioArticuloStr, &InputPrecioArticulo, EditInputPrecioArticulo);
+            GuiValueBoxFloat((Rectangle){90, 130, 200, 40}, "Precio ", InputPrecioArticuloStr, &InputPrecioArticulo, EditInputPrecioArticulo);
             if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar")) 
             {
                 // Aquí puedes agregar la lógica para manejar el botón "Confirmar"
