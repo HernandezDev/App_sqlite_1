@@ -13,13 +13,7 @@ int main(void)
 
     SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
 
-    // Define el rango de caracteres que necesitas (puedes ajustar este rango según tus necesidades)
-    int fontSize = 20; // Tamaño de la fuente
-    int charsCount = 256; // Número de caracteres a cargar
-
-    // Carga la fuente DejaVu Sans con un rango de caracteres específico
-    Font font = LoadFontEx("C:\\Windows\\Fonts\\DejaVuSans.ttf", fontSize, 0, charsCount);
-    GuiSetFont(font);
+    
 
     bool showMessageBox = false;
 
@@ -31,14 +25,15 @@ int main(void)
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
             // Muestra un texto de prueba con caracteres especiales
-            DrawTextEx(font, "Texto de prueba: ñ á é í ó ú ü", (Vector2){20, 20}, fontSize, 2, BLACK);
+            
+            DrawText("Texto de prueba: ñ á é í ó ú ü", 20, 50, 20, BLACK);
 
             
         EndDrawing();
     }
 
     // De-Initialization
-    UnloadFont(font);  // Descartar la fuente cargada
+    
     CloseWindow();  // Close window and OpenGL context
 
     return 0;
