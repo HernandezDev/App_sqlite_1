@@ -7,7 +7,7 @@
 
 int main() {
     // Inicializar la ventana
-    InitWindow(625, 600, "Ejemplo de pestañas con raygui");
+    InitWindow(625, 400, "App Sqlite Raylib");
 
     // Variables para el control de pestañas
     int currentTab = 0;
