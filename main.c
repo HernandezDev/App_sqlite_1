@@ -3,38 +3,39 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
-int main(void)
-{
-    // Initialization
-    const int screenWidth = 800;
-    const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "Ejemplo de ventana con raylib");
 
-    SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
+int main() {
+    // Inicializar la ventana
+    InitWindow(625, 600, "Ejemplo de pestañas con raygui");
 
-    
+    // Variables para el control de pestañas
+    int currentTab = 0;
+    const char *tabNames = "Tab1;Tab2;Tab3";
 
-    bool showMessageBox = false;
+    SetTargetFPS(60);
 
-    while (!WindowShouldClose())
-    {
-        // Draw
-        //----------------------------------------------------------------------------------
+    while (!WindowShouldClose()) {
         BeginDrawing();
-            ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
+        ClearBackground(RAYWHITE);
 
-            // Muestra un texto de prueba con caracteres especiales
-            
-            DrawText("Texto de prueba: ñ á é í ó ú ü", 20, 50, 20, BLACK);
+        // Dibujar los botones de las pestañas usando GuiToggleGroup
+        GuiToggleGroup((Rectangle){10, 10, 200, 40}, tabNames, &currentTab);
 
-            
+        // Contenido de cada pestaña
+        if (currentTab == 0) {
+            DrawText("Contenido de Tab1", 20, 60, 20, DARKGRAY);
+        } else if (currentTab == 1) {
+            DrawText("Contenido de Tab2", 20, 60, 20, DARKGRAY);
+        } else if (currentTab == 2) {
+            DrawText("Contenido de Tab3", 20, 60, 20, DARKGRAY);
+        }
+
         EndDrawing();
     }
 
-    // De-Initialization
-    
-    CloseWindow();  // Close window and OpenGL context
+    CloseWindow();
 
     return 0;
+
 }
