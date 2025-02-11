@@ -13,8 +13,11 @@ int main() {
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por código;Listado Completo";
     char InputNombreArticulo[50] = {0};
+    char OutputPrecioArticulo[50] = {0};
     float InputPrecioArticulo = 0.0f;
+    float OutputPrecioArticulo = 0.0f;
     char InputPrecioArticuloStr[50] = {0}; // Buffer para el valor flotante como cadena
+    char OutputPrecioArticuloStr[50] = {0};
     bool EditInputNombreArticulo = false;
     bool EditInputPrecioArticulo = false;
     SetTargetFPS(60);
