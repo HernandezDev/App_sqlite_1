@@ -11,13 +11,13 @@ int main() {
 
     // Variables para el control de pestañas
     int currentTab = 0;
-    const char *tabNames = "Tab1;Tab2;Tab3";
+    const char *tabNames = "Carga de artículos;Consulta por código;Listado Completo";
 
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
 
-        // Aca ba la logica de la actulizacion antes de dibujar 
+        // Aca ba la logica de la actualización antes de dibujar 
         //
         //
         BeginDrawing();
@@ -28,11 +28,11 @@ int main() {
 
         // Contenido de cada pestaña
         if (currentTab == 0) {
-            DrawText("Contenido de Tab1", 20, 60, 20, DARKGRAY);
+            GuiGroupBox((Rectangle){10, 60, 200, 80},"Artículo");
         } else if (currentTab == 1) {
-            DrawText("Contenido de Tab2", 20, 60, 20, DARKGRAY);
+            GuiGroupBox((Rectangle){10, 60, 200, 80},"Artículo");
         } else if (currentTab == 2) {
-            DrawText("Contenido de Tab3", 20, 60, 20, DARKGRAY);
+            GuiGroupBox((Rectangle){10, 60, 200, 80},"Listado");
         }
 
         EndDrawing();
