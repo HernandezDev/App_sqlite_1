@@ -5,13 +5,22 @@
 
 int main(void)
 {
-   // Initialization
+    // Initialization
     const int screenWidth = 800;
     const int screenHeight = 450;
 
     InitWindow(screenWidth, screenHeight, "Ejemplo de ventana con raylib");
 
     SetTargetFPS(60);  // Set our game to run at 60 frames-per-second
+
+    // Define el rango de caracteres que necesitas (puedes ajustar este rango según tus necesidades)
+    int fontSize = 20; // Tamaño de la fuente
+    int charsCount = 256; // Número de caracteres a cargar
+
+    // Carga la fuente DejaVu Sans con un rango de caracteres específico
+    Font font = LoadFontEx("C:\\Windows\\Fonts\\DejaVuSans.ttf", fontSize, 0, charsCount);
+    GuiSetFont(font);
+
     bool showMessageBox = false;
 
     while (!WindowShouldClose())
@@ -21,19 +30,16 @@ int main(void)
         BeginDrawing();
             ClearBackground(GetColor(GuiGetStyle(DEFAULT, BACKGROUND_COLOR)));
 
-            if (GuiButton((Rectangle){ 24, 24, 120, 30 }, "#191#Show Message")) showMessageBox = true;
+            // Muestra un texto de prueba con caracteres especiales
+            DrawTextEx(font, "Texto de prueba: ñ á é í ó ú ü", (Vector2){20, 20}, fontSize, 2, BLACK);
 
-            if (showMessageBox)
-            {
-                int result = GuiMessageBox((Rectangle){ 85, 70, 250, 100 },
-                    "#191#Message Box", "Hi! This is a message!", "Nice;Cool");
-
-                if (result >= 0) showMessageBox = false;
-            }
-
+            
         EndDrawing();
     }
 
     // De-Initialization
+    UnloadFont(font);  // Descartar la fuente cargada
     CloseWindow();  // Close window and OpenGL context
+
+    return 0;
 }
