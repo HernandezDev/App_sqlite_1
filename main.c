@@ -16,6 +16,10 @@ int main() {
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) {
+
+        // Aca ba la logica de la actulizacion antes de dibujar 
+        //
+        //
         BeginDrawing();
         ClearBackground(RAYWHITE);
 
