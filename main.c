@@ -3,6 +3,13 @@
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"
 
+struct Articulo
+{
+    int Id;
+    char Descrp[50];
+    float Precio;
+    char PrecioStr[50];
+};
 
 
 int main() {
@@ -12,12 +19,12 @@ int main() {
     // Variables para el control de pestañas
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por código;Listado Completo";
-    char InputNombreArticulo[50] = {0};
-    char OutputNombreArticulo[50] = {0};
-    float InputPrecioArticulo = 0.0f;
-    float OutputPrecioArticulo = 0.0f;
-    char InputPrecioArticuloStr[50] = {0}; // Buffer para el valor flotante como cadena
-    char OutputPrecioArticuloStr[50] = {0};
+
+    // Declarar una variable para entrada de datos (input)
+    struct Articulo input = {0, "", 0.0f, ""};
+    // Declarar una variable para consulta (consulta)
+    struct Articulo consulta = {0, "", 0.0f, ""};
+
     bool EditInputNombreArticulo = false;
     bool EditInputPrecioArticulo = false;
     SetTargetFPS(60);
@@ -59,10 +66,10 @@ int main() {
         {
             GuiGroupBox((Rectangle){10, 60, 300, 200}, "Artículo");
             GuiLabel((Rectangle){25, 80, 200, 40}, "Descripción");
-            GuiTextBox((Rectangle){90, 80, 200, 40}, InputNombreArticulo, 50, EditInputNombreArticulo);
+            GuiTextBox((Rectangle){90, 80, 200, 40}, input.Descrp, 50, EditInputNombreArticulo);
 
             // Usar GuiValueBoxFloat para manejar valores flotantes
-            GuiValueBoxFloat((Rectangle){90, 130, 200, 40}, "Precio ", InputPrecioArticuloStr, &InputPrecioArticulo, EditInputPrecioArticulo);
+            GuiValueBoxFloat((Rectangle){90, 130, 200, 40}, "Precio ", input.PrecioStr, &input.Precio, EditInputPrecioArticulo);
             if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar")) 
             {
                 // Aquí puedes agregar la lógica para manejar el botón "Confirmar"
