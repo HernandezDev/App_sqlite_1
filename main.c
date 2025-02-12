@@ -20,7 +20,7 @@ int main() {
     // Variables para el control de pestañas
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por Id;Listado Completo";
-
+    
     // Declarar struts para trasladar datos  (input) (consulta)
     struct Articulo input = {0,"","", 0.0f, ""};
     struct Articulo consulta = {0,"","", 0.0f, ""};
@@ -113,6 +113,7 @@ int main() {
         {
             GuiGroupBox((Rectangle){10, 60, 605, 330}, "Listado");
             
+        
         }
 
         EndDrawing();
