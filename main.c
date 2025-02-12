@@ -13,7 +13,7 @@ int main() {
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por código;Listado Completo";
     char InputNombreArticulo[50] = {0};
-    char OutputPrecioArticulo[50] = {0};
+    char OutputNombreArticulo[50] = {0};
     float InputPrecioArticulo = 0.0f;
     float OutputPrecioArticulo = 0.0f;
     char InputPrecioArticuloStr[50] = {0}; // Buffer para el valor flotante como cadena
@@ -24,24 +24,28 @@ int main() {
 
     while (!WindowShouldClose()) 
     {
-        // Obtener la posición del mouse
-        Vector2 mousePoint = GetMousePosition();
-
         // Lógica de la actualización antes de dibujar 
-        if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 80, 200, 40}) && currentTab == 0) 
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) 
         {
-            EditInputNombreArticulo = true;
-            EditInputPrecioArticulo = false;
-        }
-        else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 130, 200, 40}) && currentTab == 0)
-        {
-            EditInputNombreArticulo = false;
-            EditInputPrecioArticulo = true;
-        } 
-        else 
-        {
-            EditInputNombreArticulo = false;
-            EditInputPrecioArticulo = false;
+            Vector2 mousePoint = GetMousePosition();
+
+            // Verificar si se hizo clic en el campo de texto del nombre del artículo
+            if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 80, 200, 40}) && currentTab == 0) 
+            {
+                EditInputNombreArticulo = true;
+                EditInputPrecioArticulo = false;
+            }
+            // Verificar si se hizo clic en el campo de texto del precio del artículo
+            else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 130, 200, 40}) && currentTab == 0)
+            {
+                EditInputNombreArticulo = false;
+                EditInputPrecioArticulo = true;
+            } 
+            else 
+            {
+                EditInputNombreArticulo = false;
+                EditInputPrecioArticulo = false;
+            }
         }
 
         BeginDrawing();
