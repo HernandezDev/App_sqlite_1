@@ -20,9 +20,8 @@ int main() {
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por código;Listado Completo";
 
-    // Declarar una variable para entrada de datos (input)
+    // Declarar struts para trasladar datos  (input) (consulta)
     struct Articulo input = {0, "", 0.0f, ""};
-    // Declarar una variable para consulta (consulta)
     struct Articulo consulta = {0, "", 0.0f, ""};
 
     bool EditInputNombreArticulo = false;
