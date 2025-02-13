@@ -13,46 +13,61 @@ struct Articulo
     char PrecioStr[50];
 };
 
-void Inciarbase()
+bool SQL_AbrirBase(sqlite3 **db, const char *nombre_db) 
+{
+    int rc = sqlite3_open(nombre_db, db);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, "No se puede abrir la base de datos: %s\n", sqlite3_errmsg(*db));
+        sqlite3_close(*db);
+        return false; // Indica que hubo un error
+    }
+    return true; // Indica que la base de datos se abrió correctamente
+}
+
+bool SQL_EjecutarSentencia(sqlite3 *db, const char *sql, const char *operacion) 
+{
+    char *err_msg = 0;
+    int rc = sqlite3_exec(db, sql, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, "Error de SQL (%s): %s\n", operacion, err_msg);
+        sqlite3_free(err_msg);
+        return false; // Indica que hubo un error
+    }
+    return true; // Indica que la operación fue exitosa
+}
+
+void InciarBase()
 {
     sqlite3 *db;
-    char *err_msg = 0;
     char *sql_create;       //crear tabla
-    char *sql_index;        //
+    char *sql_index;        //crear el indice
     int rc;
     // Abre la base de datos
-    rc = sqlite3_open("Base.db", &db);
-    if (rc != SQLITE_OK) 
+    if (!SQL_AbrirBase(&db,"Base.db"))
     {
-        fprintf(stderr, "No se puede abrir la base de datos: %s\n", sqlite3_errmsg(db));
-        sqlite3_close(db);
         return;
     }
+    //crear la tabla
     sql_create = "CREATE TABLE IF NOT EXISTS Articulos(Id INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Precio REAL);";
-    rc = sqlite3_exec(db, sql_create, 0, 0, &err_msg);
-    if (rc != SQLITE_OK) 
+    if (!SQL_EjecutarSentencia(db,sql_create,"Crear Tabla"))
     {
-        fprintf(stderr, "Error de SQL (crear tabla): %s\n", err_msg);
-        sqlite3_free(err_msg);
-        sqlite3_close(db);
         return;
     }
-    // crear indice para no responder
+    // crear indice para no repetir Nombre 
     sql_index = "CREATE UNIQUE INDEX IF NOT EXISTS idx_nombre_unico ON Articulos(Nombre);";
-    rc = sqlite3_exec(db, sql_index, 0, 0, &err_msg);
-    if (rc != SQLITE_OK) 
+    if (!SQL_EjecutarSentencia(db,sql_index,"Crear Indice"))
     {
-        fprintf(stderr, "Error de SQL (crear tabla): %s\n", err_msg);
-        sqlite3_free(err_msg);
-        sqlite3_close(db);
         return;
     }
+    
     //cerrar base de datos
     sqlite3_close(db);
 }
 
 int main() {
-    Inciarbase();
+    InciarBase();
     // Inicializar la ventana
     InitWindow(625, 400, "App Sqlite Raylib");
 
