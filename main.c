@@ -178,6 +178,7 @@ int main() {
             {
                 int rc = CargarAriculo(&input);
                 //progrmar mensajes con exito errore y reiniciar  el struct
+                // 0 exto / 1 nombre repetido / 2 error en la base de datos
             }
         }
         else if (currentTab == 1) 
