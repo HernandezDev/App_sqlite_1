@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include<sqlite3.h>
 #include<raylib.h>
 #define RAYGUI_IMPLEMENTATION
 #include "raygui.h"

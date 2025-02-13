@@ -17,7 +17,8 @@
                 "-lopengl32",   //(se busca con  pacman -Ql mingw-w64-x86_64-raylib | grep dll )
                 "-lgdi32",      
                 "-lwinmm",
-                "-mwindows" // para que no abra la consola
+                "-mwindows", // para que no abra la consola
+                "-lsqlite3"
             ],
             "group": {
                 "kind": "build",
