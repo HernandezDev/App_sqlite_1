@@ -38,12 +38,22 @@ bool SQL_EjecutarSentencia(sqlite3 *db, const char *sql, const char *operacion)
     return true; // Indica que la operación fue exitosa
 }
 
+bool SQL_PrepararSentencia(sqlite3 *db, sqlite3_stmt **stmt, const char *sql) 
+{
+    int rc = sqlite3_prepare_v2(db, sql, -1, stmt, 0);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, "No se pudo preparar la sentencia: %s\n", sqlite3_errmsg(db));
+        return false; // Indicar que hubo un error
+    }
+    return true; // Indicar que la preparación fue exitosa
+}
+
 void InciarBase()
 {
     sqlite3 *db;
     char *sql_create;       //crear tabla
     char *sql_index;        //crear el indice
-    int rc;
     // Abre la base de datos
     if (!SQL_AbrirBase(&db,"Base.db"))
     {
@@ -64,6 +74,32 @@ void InciarBase()
     
     //cerrar base de datos
     sqlite3_close(db);
+}
+
+int CargarAriculo(struct Articulo *input)
+{
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    char *sql_insert;
+    if (!SQL_AbrirBase(&db,"Base.db"))
+    {
+        return 2;
+    }
+    sql_insert="INSERT INTO Articulos(Nombre, Precio) VALUES(?, ?);";
+    if (!SQL_PrepararSentencia(db,&stmt,sql_insert))
+    {
+        return 2;
+    }
+    sqlite3_bind_text(stmt, 1, input->Nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 2, input->Precio);
+    if (sqlite3_step(stmt)!=SQLITE_DONE)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
 }
 
 int main() {
@@ -140,8 +176,8 @@ int main() {
             //confirmar
             if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar")) 
             {
-                // Aquí puedes agregar la lógica para manejar el botón "Confirmar"
-                
+                int rc = CargarAriculo(&input);
+                //progrmar mensajes con exito errore y reiniciar  el struct
             }
         }
         else if (currentTab == 1) 
