@@ -13,8 +13,46 @@ struct Articulo
     char PrecioStr[50];
 };
 
+void Inciarbase()
+{
+    sqlite3 *db;
+    char *err_msg = 0;
+    char *sql_create;       //crear tabla
+    char *sql_index;        //
+    int rc;
+    // Abre la base de datos
+    rc = sqlite3_open("Base.db", &db);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, "No se puede abrir la base de datos: %s\n", sqlite3_errmsg(db));
+        sqlite3_close(db);
+        return;
+    }
+    sql_create = "CREATE TABLE IF NOT EXISTS Articulos(Id INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Precio REAL);";
+    rc = sqlite3_exec(db, sql_create, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, "Error de SQL (crear tabla): %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return;
+    }
+    // crear indice para no responder
+    sql_index = "CREATE UNIQUE INDEX IF NOT EXISTS idx_nombre_unico ON Articulos(Nombre);";
+    rc = sqlite3_exec(db, sql_index, 0, 0, &err_msg);
+    if (rc != SQLITE_OK) 
+    {
+        fprintf(stderr, "Error de SQL (crear tabla): %s\n", err_msg);
+        sqlite3_free(err_msg);
+        sqlite3_close(db);
+        return;
+    }
+    //cerrar base de datos
+    sqlite3_close(db);
+}
 
 int main() {
+    Inciarbase();
     // Inicializar la ventana
     InitWindow(625, 400, "App Sqlite Raylib");
 
