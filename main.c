@@ -102,6 +102,41 @@ int CargarAriculo(struct Articulo *input)
     }
 }
 
+void MostrarMessageBoxOK(const char *titulo, const char *mensaje) 
+{
+    // Dimensiones del MessageBox
+    int ancho = 300;
+    int alto = 150;
+
+    // Posición del MessageBox (centrado en la pantalla)
+    int x = (GetScreenWidth() - ancho) / 2;
+    int y = (GetScreenHeight() - alto) / 2;
+
+    // Bucle para mostrar el MessageBox
+    while (!WindowShouldClose()) 
+    {
+        BeginDrawing();
+        
+        // Dibujar el fondo del MessageBox
+        DrawRectangle(x, y, ancho, alto, LIGHTGRAY);
+        DrawRectangleLines(x, y, ancho, alto, DARKGRAY);
+
+        // Dibujar el título
+        DrawText(titulo, x + 10, y + 10, 20, BLACK);
+
+        // Dibujar el mensaje
+        DrawText(mensaje, x + 10, y + 50, 20, BLACK);
+
+        // Dibujar el botón "OK"
+        if (GuiButton((Rectangle){x + 100, y + 100, 100, 30}, "OK")) 
+        {
+            break; // Salir del bucle cuando se presione "OK"
+        }
+
+        EndDrawing();
+    }
+}
+
 int main() {
     InciarBase();
     // Inicializar la ventana
@@ -115,6 +150,10 @@ int main() {
     struct Articulo input = {0,"","", 0.0f, ""};
     struct Articulo consulta = {0,"","", 0.0f, ""};
 
+    //ventana de mensaje activa
+    bool MensajeActivo=false;
+
+    //boxes editables
     bool EditInputNombreArticulo = false;
     bool EditInputPrecioArticulo = false;
     bool EditConsultaId = false;
@@ -176,9 +215,21 @@ int main() {
             //confirmar
             if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar")) 
             {
-                int rc = CargarAriculo(&input);
-                //progrmar mensajes con exito errore y reiniciar  el struct
+                //progrmar mensajes con exito errores y reiniciar  el struct
                 // 0 exto / 1 nombre repetido / 2 error en la base de datos
+                switch (CargarAriculo(&input))
+                {
+                case 0:
+                    MostrarMessageBoxOK("Articulos","Articulo ingresado");
+                    input = (struct Articulo){0, "", "", 0.0f, ""};
+                    break;
+                case 1:
+                    MostrarMessageBoxOK("Error","Nombre Repetido");
+                    break;
+                case 2:
+                    MostrarMessageBoxOK("Error","Error en la base de datos");
+                    break;
+                }
             }
         }
         else if (currentTab == 1) 
@@ -196,7 +247,7 @@ int main() {
             //Consultar
             if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar")) 
             {
-                // Aquí puedes agregar la lógica para manejar el botón "Confirmar"
+                // Aquí puedes agregar la lógica para manejar el botón "Consultar"
                 
             }
         }
