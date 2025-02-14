@@ -63,6 +63,7 @@ void MostrarMessageBoxOK(const char *titulo, const char *mensaje)
     while (!WindowShouldClose()) 
     {
         BeginDrawing();
+        ClearBackground(RAYWHITE);
         
         // Dibujar el fondo del MessageBox
         DrawRectangle(x, y, ancho, alto, LIGHTGRAY);
