@@ -184,15 +184,15 @@ int main() {
                 
                 MensajeActivo=true;
                 //progrmar mensajes con exito errores y reiniciar  el struct
-                // 0 exto / 1 nombre repetido / 2 error en la base de datos
+                // 0 exito / 1 nombre repetido / 2 error en la base de datos
                 switch (CargarAriculo(&input))
                 {
                 case 0:
                     strcpy(titulo,"Articulos"); strcpy(mensaje,"Articulo Ingrsado");
-                    input = (struct Articulo){0, "", "", 0.0f, ""};
+                    input = (struct Articulo){0, "", "", 0.0f, ""};                     //Re-Incialzar el struct Articulo "input"
                     break;
                 case 1:
-                    strcpy(titulo,"Error"); strcpy(mensaje,"Nombre Repetido");
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
                     break;
                 case 2:
                     strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
