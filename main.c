@@ -49,6 +49,41 @@ bool SQL_PrepararSentencia(sqlite3 *db, sqlite3_stmt **stmt, const char *sql)
     return true; // Indicar que la preparación fue exitosa
 }
 
+void MostrarMessageBoxOK(const char *titulo, const char *mensaje) 
+{
+    // Dimensiones del MessageBox
+    int ancho = 300;
+    int alto = 150;
+
+    // Posición del MessageBox (centrado en la pantalla)
+    int x = (GetScreenWidth() - ancho) / 2;
+    int y = (GetScreenHeight() - alto) / 2;
+
+    // Bucle para mostrar el MessageBox
+    while (!WindowShouldClose()) 
+    {
+        BeginDrawing();
+        
+        // Dibujar el fondo del MessageBox
+        DrawRectangle(x, y, ancho, alto, LIGHTGRAY);
+        DrawRectangleLines(x, y, ancho, alto, DARKGRAY);
+
+        // Dibujar el título
+        DrawText(titulo, x + 10, y + 10, 20, BLACK);
+
+        // Dibujar el mensaje
+        DrawText(mensaje, x + 10, y + 50, 20, BLACK);
+
+        // Dibujar el botón "OK"
+        if (GuiButton((Rectangle){x + 100, y + 100, 100, 30}, "OK")) 
+        {
+            break; // Salir del bucle cuando se presione "OK"
+        }
+
+        EndDrawing();
+    }
+}
+
 void InciarBase()
 {
     sqlite3 *db;
@@ -99,41 +134,6 @@ int CargarAriculo(struct Articulo *input)
     else
     {
         return 0;
-    }
-}
-
-void MostrarMessageBoxOK(const char *titulo, const char *mensaje) 
-{
-    // Dimensiones del MessageBox
-    int ancho = 300;
-    int alto = 150;
-
-    // Posición del MessageBox (centrado en la pantalla)
-    int x = (GetScreenWidth() - ancho) / 2;
-    int y = (GetScreenHeight() - alto) / 2;
-
-    // Bucle para mostrar el MessageBox
-    while (!WindowShouldClose()) 
-    {
-        BeginDrawing();
-        
-        // Dibujar el fondo del MessageBox
-        DrawRectangle(x, y, ancho, alto, LIGHTGRAY);
-        DrawRectangleLines(x, y, ancho, alto, DARKGRAY);
-
-        // Dibujar el título
-        DrawText(titulo, x + 10, y + 10, 20, BLACK);
-
-        // Dibujar el mensaje
-        DrawText(mensaje, x + 10, y + 50, 20, BLACK);
-
-        // Dibujar el botón "OK"
-        if (GuiButton((Rectangle){x + 100, y + 100, 100, 30}, "OK")) 
-        {
-            break; // Salir del bucle cuando se presione "OK"
-        }
-
-        EndDrawing();
     }
 }
 
