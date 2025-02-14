@@ -49,47 +49,6 @@ bool SQL_PrepararSentencia(sqlite3 *db, sqlite3_stmt **stmt, const char *sql)
     return true; // Indicar que la preparación fue exitosa
 }
 
-void MostrarMessageBoxOK(const char *titulo, const char *mensaje) 
-{
-    // Dimensiones del MessageBox
-    int ancho = 300;
-    int alto = 150;
-
-    // Posición del MessageBox (centrado en la pantalla)
-    int x = (GetScreenWidth() - ancho) / 2;
-    int y = (GetScreenHeight() - alto) / 2;
-
-    // Bucle para mostrar el MessageBox
-    while (!WindowShouldClose()) 
-    {
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-        
-        // Dibujar el fondo del MessageBox
-        DrawRectangle(x, y, ancho, alto, LIGHTGRAY);
-        DrawRectangleLines(x, y, ancho, alto, DARKGRAY);
-
-        //Barra de titulo
-        DrawRectangle( x , y , 300,30, BLACK);
-
-        // Dibujar el título
-        DrawText(titulo, x + 10, y + 10, 20, RAYWHITE);
-        
-        
-
-        // Dibujar el mensaje
-        DrawText(mensaje, x + 10, y + 50, 20, BLACK);
-
-        // Dibujar el botón "OK"
-        if (GuiButton((Rectangle){x + 100, y + 100, 100, 30}, "OK")) 
-        {
-            break; // Salir del bucle cuando se presione "OK"
-        }
-
-        EndDrawing();
-    }
-}
-
 void InciarBase()
 {
     sqlite3 *db;
@@ -156,9 +115,10 @@ int main() {
     struct Articulo input = {0,"","", 0.0f, ""};
     struct Articulo consulta = {0,"","", 0.0f, ""};
 
-    //ventana de mensaje activa
+    //ventana de mensaje confirmar
     bool MensajeActivo=false;
-
+    char titulo[50]="";
+    char mensaje[50]="";
     //boxes editables
     bool EditInputNombreArticulo = false;
     bool EditInputPrecioArticulo = false;
@@ -168,7 +128,7 @@ int main() {
     while (!WindowShouldClose()) 
     {
         // Lógica de la actualización antes de dibujar 
-        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)) 
+        if (IsMouseButtonPressed(MOUSE_LEFT_BUTTON)&&!MensajeActivo) 
         {
             Vector2 mousePoint = GetMousePosition();
 
@@ -207,7 +167,7 @@ int main() {
         GuiToggleGroup((Rectangle){10, 10, 200, 40}, tabNames, &currentTab);
 
         // Contenido de cada pestaña
-        if (currentTab == 0) 
+        if (currentTab == 0 && !MensajeActivo) 
         {
             
             GuiGroupBox((Rectangle){10, 60, 300, 200}, "Artículo");
@@ -221,24 +181,28 @@ int main() {
             //confirmar
             if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar")) 
             {
+                
+                MensajeActivo=true;
                 //progrmar mensajes con exito errores y reiniciar  el struct
                 // 0 exto / 1 nombre repetido / 2 error en la base de datos
                 switch (CargarAriculo(&input))
                 {
                 case 0:
-                    MostrarMessageBoxOK("Articulos","Articulo ingresado");
+                    strcpy(titulo,"Articulos"); strcpy(mensaje,"Articulo Ingrsado");
                     input = (struct Articulo){0, "", "", 0.0f, ""};
                     break;
                 case 1:
-                    MostrarMessageBoxOK("Error","Nombre Repetido");
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Nombre Repetido");
                     break;
                 case 2:
-                    MostrarMessageBoxOK("Error","Error en la base de datos");
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
                     break;
                 }
             }
+            
+            
         }
-        else if (currentTab == 1) 
+        else if (currentTab == 1 && !MensajeActivo) 
         {
             GuiGroupBox((Rectangle){10, 60, 300, 240}, "Artículo");
             //Id
@@ -257,12 +221,23 @@ int main() {
                 
             }
         }
-        else if (currentTab == 2) 
+        else if (currentTab == 2 && !MensajeActivo ) 
         {
             GuiGroupBox((Rectangle){10, 60, 605, 330}, "Listado");
             
         
         }
+        if (MensajeActivo)
+            {
+                int result = GuiMessageBox((Rectangle){ 187.5f, 150.0f, 250, 100 },
+                    titulo, mensaje, "OK");
+
+                if (result >= 0)
+                {
+                    MensajeActivo = false;
+                    strcpy(titulo,""); strcpy(mensaje,"");
+                } 
+            }
 
         EndDrawing();
     }
