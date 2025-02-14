@@ -69,8 +69,13 @@ void MostrarMessageBoxOK(const char *titulo, const char *mensaje)
         DrawRectangle(x, y, ancho, alto, LIGHTGRAY);
         DrawRectangleLines(x, y, ancho, alto, DARKGRAY);
 
+        //Barra de titulo
+        DrawRectangle( x , y , 300,30, BLACK);
+
         // Dibujar el título
-        DrawText(titulo, x + 10, y + 10, 20, BLACK);
+        DrawText(titulo, x + 10, y + 10, 20, RAYWHITE);
+        
+        
 
         // Dibujar el mensaje
         DrawText(mensaje, x + 10, y + 50, 20, BLACK);
