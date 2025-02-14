@@ -167,7 +167,7 @@ int main() {
         GuiToggleGroup((Rectangle){10, 10, 200, 40}, tabNames, &currentTab);
 
         // Contenido de cada pestaña
-        if (currentTab == 0 && !MensajeActivo) 
+        if (currentTab == 0 ) 
         {
             
             GuiGroupBox((Rectangle){10, 60, 300, 200}, "Artículo");
@@ -179,7 +179,7 @@ int main() {
             GuiLabel((Rectangle){25, 130, 200, 40}, "Precio");
             GuiValueBoxFloat((Rectangle){90, 130, 200, 40}, "", input.PrecioStr, &input.Precio, EditInputPrecioArticulo);
             //confirmar
-            if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar")) 
+            if (GuiButton((Rectangle){90, 180, 200, 40}, "Confirmar") && !MensajeActivo) 
             {
                 
                 MensajeActivo=true;
@@ -202,7 +202,7 @@ int main() {
             
             
         }
-        else if (currentTab == 1 && !MensajeActivo) 
+        else if (currentTab == 1) 
         {
             GuiGroupBox((Rectangle){10, 60, 300, 240}, "Artículo");
             //Id
@@ -215,13 +215,13 @@ int main() {
             GuiLabel((Rectangle){25, 180, 200, 40}, "Precio");
             GuiValueBoxFloat((Rectangle){90, 180, 200, 40}, "", consulta.PrecioStr, &consulta.Precio, false);
             //Consultar
-            if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar")) 
+            if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar") && !MensajeActivo) 
             {
                 // Aquí puedes agregar la lógica para manejar el botón "Consultar"
                 
             }
         }
-        else if (currentTab == 2 && !MensajeActivo ) 
+        else if (currentTab == 2) 
         {
             GuiGroupBox((Rectangle){10, 60, 605, 330}, "Listado");
             
