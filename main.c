@@ -94,11 +94,46 @@ int CargarAriculo(struct Articulo *input)
     sqlite3_bind_double(stmt, 2, input->Precio);
     if (sqlite3_step(stmt)!=SQLITE_DONE)
     {
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
         return 1;
     }
     else
     {
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
         return 0;
+    }
+}
+
+int ConsultarAriculo(struct Articulo *consulta)
+{
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    char *sql_select;
+    if (!SQL_AbrirBase(&db,"Base.db"))
+    {
+        return 2;
+    }
+    sql_select = "SELECT Id, Nombre, Precio FROM Articulos WHERE Id = ?;";
+    if (!SQL_PrepararSentencia(db,&stmt,sql_select))
+    {
+        return 2;
+    }
+    sqlite3_bind_int(stmt,1,consulta->Id);
+    if (sqlite3_step(stmt)==SQLITE_ROW)
+    {
+        strcpy(consulta->Nombre,sqlite3_column_text(stmt, 1));
+        consulta->Precio=sqlite3_column_double(stmt, 2);
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return 0;
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+        sqlite3_close(db);
+        return 1;
     }
 }
 
@@ -217,8 +252,22 @@ int main() {
             //Consultar
             if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar") && !MensajeActivo) 
             {
-                // Aquí puedes agregar la lógica para manejar el botón "Consultar"
-                
+                MensajeActivo=true;
+                switch (ConsultarAriculo(&consulta))
+                {
+                case 0:
+                    strcpy(titulo,"Articulos"); strcpy(mensaje,"Articulo Encontrado");
+                    break;
+                case 1:
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
+                    consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                    break;
+                case 2:
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
+                    consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                    break;
+                }
+                snprintf(consulta.PrecioStr, sizeof(consulta.PrecioStr), "%.2f", consulta.Precio);
             }
         }
         else if (currentTab == 2) 
