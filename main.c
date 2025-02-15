@@ -33,6 +33,7 @@ bool SQL_EjecutarSentencia(sqlite3 *db, const char *sql, const char *operacion)
     {
         fprintf(stderr, "Error de SQL (%s): %s\n", operacion, err_msg);
         sqlite3_free(err_msg);
+        sqlite3_close(db); // Cerrar la base de datos en caso de error
         return false; // Indica que hubo un error
     }
     return true; // Indica que la operación fue exitosa
@@ -44,6 +45,8 @@ bool SQL_PrepararSentencia(sqlite3 *db, sqlite3_stmt **stmt, const char *sql)
     if (rc != SQLITE_OK) 
     {
         fprintf(stderr, "No se pudo preparar la sentencia: %s\n", sqlite3_errmsg(db));
+        sqlite3_finalize(*stmt); // Finalizar la sentencia en caso de error
+        sqlite3_close(db); // Cerrar la base de datos en caso de error
         return false; // Indicar que hubo un error
     }
     return true; // Indicar que la preparación fue exitosa
