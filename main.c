@@ -255,17 +255,16 @@ int main() {
             //Consultar
             if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar") && !MensajeActivo) 
             {
-                MensajeActivo=true;
+                
                 switch (ConsultarAriculo(&consulta))
                 {
-                case 0:
-                    strcpy(titulo,"Articulos"); strcpy(mensaje,"Articulo Encontrado");
-                    break;
                 case 1:
+                    MensajeActivo=true;
                     strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
                     consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
                     break;
                 case 2:
+                    MensajeActivo=true;
                     strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
                     consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
                     break;
