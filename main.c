@@ -339,7 +339,7 @@ int main() {
             if (IsKeyDown(KEY_DOWN)) scroll.y -= 2;   // Desplazar hacia arriba
             //Boton actualizar
         
-            if (GuiButton((Rectangle){212.5f, 55, 200, 40},"Actulizar"))
+            if (GuiButton((Rectangle){212.5f, 55, 200, 40},"Actulizar")&& !MensajeActivo)
             {
                 free(Lista);
                 LargoLista=CantidadRows();
