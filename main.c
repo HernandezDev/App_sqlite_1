@@ -140,6 +140,54 @@ int ConsultarAriculo(struct Articulo *consulta)
     }
 }
 
+int CantidadRows()
+{
+    int cantidad=0;
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    char *sql_select;
+    SQL_AbrirBase(&db,"Base.db");
+    sql_select="SELECT COUNT(*) FROM Articulos;";
+    SQL_PrepararSentencia(db,&stmt,sql_select);
+    if (sqlite3_step(stmt)==SQLITE_ROW)
+    {
+        cantidad = sqlite3_column_int(stmt, 0);
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return cantidad;
+
+}
+
+bool CargarLista(struct Articulo *Lista)
+{
+    int i=0;
+    sqlite3 *db;
+    sqlite3_stmt *stmt;
+    char *sql_select;
+    if (!SQL_AbrirBase(&db,"Base.db"))
+    {
+        return false;
+    }
+    sql_select="SELECT Id, Nombre, Precio FROM Articulos;";
+    if (!SQL_PrepararSentencia(db,&stmt,sql_select))
+    {
+        return false;
+    }
+    while (sqlite3_step(stmt)==SQLITE_ROW)
+    {
+        Lista[i].Id=sqlite3_column_int(stmt, 0);
+        sprintf(Lista[i].IdStr,"%d",Lista[i].Id);
+        strcpy(Lista[i].Nombre,sqlite3_column_text(stmt, 1));
+        Lista[i].Precio=sqlite3_column_double(stmt, 2);
+        sprintf(Lista[i].PrecioStr,"%.2f",Lista[i].Precio);
+        i++;
+    }
+    sqlite3_finalize(stmt);
+    sqlite3_close(db);
+    return true;
+}
+
 int main() {
     InciarBase();
     // Inicializar la ventana
@@ -161,6 +209,18 @@ int main() {
     bool EditInputNombreArticulo = false;
     bool EditInputPrecioArticulo = false;
     bool EditConsultaId = false;
+
+    //Arreglo de lista
+    int LargoLista=CantidadRows();
+    struct Articulo *Lista=malloc(LargoLista * sizeof(struct Articulo));
+    CargarLista(Lista);
+
+    // Variables para el desplazamiento
+    Vector2 scroll = {0, 100};
+    float alturaFila = 30; // Altura de cada fila
+    float espacioFilas = 10; // Espacio entre filas
+
+
     SetTargetFPS(60);
 
     while (!WindowShouldClose()) 
@@ -274,7 +334,40 @@ int main() {
         }
         else if (currentTab == 2) 
         {
-            GuiGroupBox((Rectangle){10, 60, 605, 330}, "Listado");
+            // Lógica de desplazamiento
+            if (IsKeyDown(KEY_UP)) scroll.y += 2; // Desplazar hacia abajo
+            if (IsKeyDown(KEY_DOWN)) scroll.y -= 2;   // Desplazar hacia arriba
+            //Boton actualizar
+        
+            if (GuiButton((Rectangle){212.5f, 55, 200, 40},"Actulizar"))
+            {
+                free(Lista);
+                LargoLista=CantidadRows();
+                Lista=malloc(LargoLista * sizeof(struct Articulo));
+                CargarLista(Lista);
+            }
+       
+        
+            // Borde la tabla
+            GuiGroupBox((Rectangle){10, 100, 605, 290}, "Listado");
+            // Encabezados de la tabla
+            DrawRectangle(10, 105, 605, 25, GRAY);
+            DrawText("ID", 20, 110, 20, BLACK);
+            DrawText("Nombre", 100, 110, 20, BLACK);
+            DrawText("Precio", 300, 110, 20, BLACK);
+            BeginScissorMode(10,130, 605, 260); // Área visible de la tabla
+            {
+                // Filas de la tabla
+                for (int i = 0; i < LargoLista; i++)   
+                {
+                    float y = 40 + i * (alturaFila + espacioFilas) + scroll.y;
+                    DrawText(Lista[i].IdStr, 20, y, 20, BLACK);
+                    DrawText(Lista[i].Nombre, 100, y, 20, BLACK);
+                    DrawText(Lista[i].PrecioStr, 300, y, 20, BLACK);
+                }
+            }
+            EndScissorMode();
+
             
         
         }
@@ -292,6 +385,7 @@ int main() {
 
         EndDrawing();
     }
+    free(Lista);
     CloseWindow();
     return 0;
 }

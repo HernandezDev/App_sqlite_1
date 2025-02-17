@@ -17,7 +17,7 @@
                 "-lopengl32",   //(se busca con  pacman -Ql mingw-w64-x86_64-raylib | grep dll )
                 "-lgdi32",      //"ldd main.exe" o "ldd main.exe | grep lib"  para conocer todas las dependencias
                 "-lwinmm",
-                // para que no abra la consola "-mwindows"
+                "-mwindows",// para que no abra la consola "-mwindows"
                 "-lsqlite3"
             ],
             "group": {
