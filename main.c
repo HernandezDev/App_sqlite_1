@@ -33,7 +33,6 @@ bool SQL_EjecutarSentencia(sqlite3 *db, const char *sql, const char *operacion)
     {
         fprintf(stderr, "Error de SQL (%s): %s\n", operacion, err_msg);
         sqlite3_free(err_msg);
-        sqlite3_close(db); // Cerrar la base de datos en caso de error
         return false; // Indica que hubo un error
     }
     return true; // Indica que la operación fue exitosa
@@ -46,22 +45,16 @@ bool SQL_PrepararSentencia(sqlite3 *db, sqlite3_stmt **stmt, const char *sql)
     {
         fprintf(stderr, "No se pudo preparar la sentencia: %s\n", sqlite3_errmsg(db));
         sqlite3_finalize(*stmt); // Finalizar la sentencia en caso de error
-        sqlite3_close(db); // Cerrar la base de datos en caso de error
         return false; // Indicar que hubo un error
     }
     return true; // Indicar que la preparación fue exitosa
 }
 
-void InciarBase()
+void InciarBase(sqlite3 *db)
 {
-    sqlite3 *db;
     char *sql_create;       //crear tabla
     char *sql_index;        //crear el indice
-    // Abre la base de datos
-    if (!SQL_AbrirBase(&db,"Base.db"))
-    {
-        return;
-    }
+
     //crear la tabla
     sql_create = "CREATE TABLE IF NOT EXISTS Articulos(Id INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Precio REAL);";
     if (!SQL_EjecutarSentencia(db,sql_create,"Crear Tabla"))
@@ -74,20 +67,12 @@ void InciarBase()
     {
         return;
     }
-    
-    //cerrar base de datos
-    sqlite3_close(db);
 }
 
-int CargarAriculo(struct Articulo *input)
+int CargarAriculo(sqlite3 *db, struct Articulo *input)
 {
-    sqlite3 *db;
     sqlite3_stmt *stmt;
     char *sql_insert;
-    if (!SQL_AbrirBase(&db,"Base.db"))
-    {
-        return 2;
-    }
     sql_insert="INSERT INTO Articulos(Nombre, Precio) VALUES(?, ?);";
     if (!SQL_PrepararSentencia(db,&stmt,sql_insert))
     {
@@ -98,26 +83,19 @@ int CargarAriculo(struct Articulo *input)
     if (sqlite3_step(stmt)!=SQLITE_DONE)
     {
         sqlite3_finalize(stmt);
-        sqlite3_close(db);
         return 1;
     }
     else
     {
         sqlite3_finalize(stmt);
-        sqlite3_close(db);
         return 0;
     }
 }
 
-int ConsultarAriculo(struct Articulo *consulta)
+int ConsultarAriculo(sqlite3 *db, struct Articulo *consulta)
 {
-    sqlite3 *db;
     sqlite3_stmt *stmt;
     char *sql_select;
-    if (!SQL_AbrirBase(&db,"Base.db"))
-    {
-        return 2;
-    }
     sql_select = "SELECT Id, Nombre, Precio FROM Articulos WHERE Id = ?;";
     if (!SQL_PrepararSentencia(db,&stmt,sql_select))
     {
@@ -129,24 +107,20 @@ int ConsultarAriculo(struct Articulo *consulta)
         strcpy(consulta->Nombre,sqlite3_column_text(stmt, 1));
         consulta->Precio=sqlite3_column_double(stmt, 2);
         sqlite3_finalize(stmt);
-        sqlite3_close(db);
         return 0;
     }
     else
     {
         sqlite3_finalize(stmt);
-        sqlite3_close(db);
         return 1;
     }
 }
 
-int CantidadRows()
+int CantidadRows(sqlite3 *db)
 {
     int cantidad=0;
-    sqlite3 *db;
     sqlite3_stmt *stmt;
     char *sql_select;
-    SQL_AbrirBase(&db,"Base.db");
     sql_select="SELECT COUNT(*) FROM Articulos;";
     SQL_PrepararSentencia(db,&stmt,sql_select);
     if (sqlite3_step(stmt)==SQLITE_ROW)
@@ -154,21 +128,14 @@ int CantidadRows()
         cantidad = sqlite3_column_int(stmt, 0);
     }
     sqlite3_finalize(stmt);
-    sqlite3_close(db);
     return cantidad;
-
 }
 
-bool CargarLista(struct Articulo *Lista)
+bool CargarLista(sqlite3 *db, struct Articulo *Lista)
 {
     int i=0;
-    sqlite3 *db;
     sqlite3_stmt *stmt;
     char *sql_select;
-    if (!SQL_AbrirBase(&db,"Base.db"))
-    {
-        return false;
-    }
     sql_select="SELECT Id, Nombre, Precio FROM Articulos;";
     if (!SQL_PrepararSentencia(db,&stmt,sql_select))
     {
@@ -184,12 +151,17 @@ bool CargarLista(struct Articulo *Lista)
         i++;
     }
     sqlite3_finalize(stmt);
-    sqlite3_close(db);
     return true;
 }
 
 int main() {
-    InciarBase();
+    sqlite3 *db;
+    if (!SQL_AbrirBase(&db,"Base.db"))
+    {
+        return 1;
+    }
+
+    InciarBase(db);
     // Inicializar la ventana
     InitWindow(625, 400, "App Sqlite Raylib");
 
@@ -211,15 +183,14 @@ int main() {
     bool EditConsultaId = false;
 
     //Arreglo de lista
-    int LargoLista=CantidadRows();
+    int LargoLista=CantidadRows(db);
     struct Articulo *Lista=malloc(LargoLista * sizeof(struct Articulo));
-    CargarLista(Lista);
+    CargarLista(db, Lista);
 
     // Variables para el desplazamiento
-    Vector2 scroll = {0, 100};
+    Vector2 scroll = {0, 60};
     float alturaFila = 30; // Altura de cada fila
     float espacioFilas = 10; // Espacio entre filas
-
 
     SetTargetFPS(60);
 
@@ -283,7 +254,7 @@ int main() {
                 MensajeActivo=true;
                 //progrmar mensajes con exito errores y reiniciar  el struct
                 // 0 exito / 1 nombre repetido / 2 error en la base de datos
-                switch (CargarAriculo(&input))
+                switch (CargarAriculo(db, &input))
                 {
                 case 0:
                     strcpy(titulo,"Articulos"); strcpy(mensaje,"Articulo Ingrsado");
@@ -296,6 +267,11 @@ int main() {
                     strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
                     break;
                 }
+                //actualizar lista
+                free(Lista);
+                LargoLista=CantidadRows(db);
+                Lista=malloc(LargoLista * sizeof(struct Articulo));
+                CargarLista(db, Lista);
             }
             
             
@@ -316,7 +292,7 @@ int main() {
             if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar") && !MensajeActivo) 
             {
                 
-                switch (ConsultarAriculo(&consulta))
+                switch (ConsultarAriculo(db, &consulta))
                 {
                 case 1:
                     MensajeActivo=true;
@@ -337,25 +313,16 @@ int main() {
             // Lógica de desplazamiento
             if (IsKeyDown(KEY_UP)) scroll.y += 2; // Desplazar hacia abajo
             if (IsKeyDown(KEY_DOWN)) scroll.y -= 2;   // Desplazar hacia arriba
-            //Boton actualizar
-        
-            if (GuiButton((Rectangle){212.5f, 55, 200, 40},"Actulizar")&& !MensajeActivo)
-            {
-                free(Lista);
-                LargoLista=CantidadRows();
-                Lista=malloc(LargoLista * sizeof(struct Articulo));
-                CargarLista(Lista);
-            }
+            
        
-        
             // Borde la tabla
-            GuiGroupBox((Rectangle){10, 100, 605, 290}, "Listado");
+            GuiGroupBox((Rectangle){10, 60, 605, 330}, "Listado");
             // Encabezados de la tabla
-            DrawRectangle(10, 105, 605, 25, GRAY);
-            DrawText("ID", 20, 110, 20, BLACK);
-            DrawText("Nombre", 100, 110, 20, BLACK);
-            DrawText("Precio", 300, 110, 20, BLACK);
-            BeginScissorMode(10,130, 605, 260); // Área visible de la tabla
+            DrawRectangle(10, 65, 605, 25, GRAY);
+            DrawText("ID", 20, 70, 20, BLACK);
+            DrawText("Nombre", 100, 70, 20, BLACK);
+            DrawText("Precio", 300, 70, 20, BLACK);
+            BeginScissorMode(10,90, 605, 300); // Área visible de la tabla
             {
                 // Filas de la tabla
                 for (int i = 0; i < LargoLista; i++)   
@@ -367,25 +334,23 @@ int main() {
                 }
             }
             EndScissorMode();
-
-            
-        
         }
         if (MensajeActivo)
-            {
-                int result = GuiMessageBox((Rectangle){ 187.5f, 150.0f, 250, 100 },
-                    titulo, mensaje, "OK");
+        {
+            int result = GuiMessageBox((Rectangle){ 187.5f, 150.0f, 250, 100 },
+                titulo, mensaje, "OK");
 
-                if (result >= 0)
-                {
-                    MensajeActivo = false;
-                    strcpy(titulo,""); strcpy(mensaje,"");
-                } 
-            }
+            if (result >= 0)
+            {
+                MensajeActivo = false;
+                strcpy(titulo,""); strcpy(mensaje,"");
+            } 
+        }
 
         EndDrawing();
     }
     free(Lista);
+    sqlite3_close(db);
     CloseWindow();
     return 0;
 }
