@@ -188,7 +188,7 @@ int main() {
     CargarLista(db, Lista);
 
     // Variables para el desplazamiento
-    Vector2 scroll = {0, 100};
+    Vector2 scroll = {0, 60};
     float alturaFila = 30; // Altura de cada fila
     float espacioFilas = 10; // Espacio entre filas
 
@@ -267,6 +267,11 @@ int main() {
                     strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
                     break;
                 }
+                //actualizar lista
+                free(Lista);
+                LargoLista=CantidadRows(db);
+                Lista=malloc(LargoLista * sizeof(struct Articulo));
+                CargarLista(db, Lista);
             }
             
             
@@ -308,24 +313,16 @@ int main() {
             // Lógica de desplazamiento
             if (IsKeyDown(KEY_UP)) scroll.y += 2; // Desplazar hacia abajo
             if (IsKeyDown(KEY_DOWN)) scroll.y -= 2;   // Desplazar hacia arriba
-            //Boton actualizar
-        
-            if (GuiButton((Rectangle){212.5f, 55, 200, 40},"Actulizar")&& !MensajeActivo)
-            {
-                free(Lista);
-                LargoLista=CantidadRows(db);
-                Lista=malloc(LargoLista * sizeof(struct Articulo));
-                CargarLista(db, Lista);
-            }
+            
        
             // Borde la tabla
-            GuiGroupBox((Rectangle){10, 100, 605, 290}, "Listado");
+            GuiGroupBox((Rectangle){10, 60, 605, 330}, "Listado");
             // Encabezados de la tabla
-            DrawRectangle(10, 105, 605, 25, GRAY);
-            DrawText("ID", 20, 110, 20, BLACK);
-            DrawText("Nombre", 100, 110, 20, BLACK);
-            DrawText("Precio", 300, 110, 20, BLACK);
-            BeginScissorMode(10,130, 605, 260); // Área visible de la tabla
+            DrawRectangle(10, 65, 605, 25, GRAY);
+            DrawText("ID", 20, 70, 20, BLACK);
+            DrawText("Nombre", 100, 70, 20, BLACK);
+            DrawText("Precio", 300, 70, 20, BLACK);
+            BeginScissorMode(10,90, 605, 300); // Área visible de la tabla
             {
                 // Filas de la tabla
                 for (int i = 0; i < LargoLista; i++)   
