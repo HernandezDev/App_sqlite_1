@@ -50,23 +50,81 @@ bool SQL_PrepararSentencia(sqlite3 *db, sqlite3_stmt **stmt, const char *sql)
     return true; // Indicar que la preparación fue exitosa
 }
 
-void InciarBase(sqlite3 *db)
+bool InciarBase(sqlite3 *db)
 {
     char *sql_create;       //crear tabla
-    char *sql_index;        //crear el indice
+    char *sql_index;        //crear el indice para no repetir el nombre
+    char *sql_trigger_INSERT_nombre; //trigger para no insertan nombre vacio
+    char *sql_trigger_UPDATE_nombre; //trigger para no actualizar nombre vacio
+    char *sql_trigger_INSERT_precio; //trigger para no insertar cero o negativo
+    char *sql_trigger_UPDATE_precio; //trigger para no actualizar cero o negativo
 
     //crear la tabla
     sql_create = "CREATE TABLE IF NOT EXISTS Articulos(Id INTEGER PRIMARY KEY AUTOINCREMENT, Nombre TEXT, Precio REAL);";
     if (!SQL_EjecutarSentencia(db,sql_create,"Crear Tabla"))
     {
-        return;
+        return false;
     }
     // crear indice para no repetir Nombre 
     sql_index = "CREATE UNIQUE INDEX IF NOT EXISTS idx_nombre_unico ON Articulos(Nombre);";
     if (!SQL_EjecutarSentencia(db,sql_index,"Crear Indice"))
     {
-        return;
+        return false;
     }
+    //trigger para no insertar nombre vacio
+    sql_trigger_INSERT_nombre = "CREATE TRIGGER IF NOT EXISTS Insert_Nombre"
+                                " BEFORE INSERT ON Articulos"
+                                " FOR EACH ROW"
+                                " BEGIN"
+                                " SELECT CASE WHEN NEW.Nombre = '' THEN"
+                                " RAISE(ABORT, 'Nombre no puede estar vacio')"
+                                " END;"
+                                " END;";
+
+    if (!SQL_EjecutarSentencia(db,sql_trigger_INSERT_nombre,"Crear Trigger Insert"))
+    {
+        return false;
+    }
+    //trigger para no actualizar nombre vacio
+    sql_trigger_UPDATE_nombre = "CREATE TRIGGER IF NOT EXISTS Update_Nombre"
+                                " BEFORE UPDATE OF Nombre ON Articulos"
+                                " FOR EACH ROW"
+                                " BEGIN"
+                                " SELECT CASE WHEN NEW.Nombre = '' THEN"
+                                " RAISE(ABORT, 'Nombre no puede estar vacio')"
+                                " END;"
+                                " END;";
+    if (!SQL_EjecutarSentencia(db,sql_trigger_UPDATE_nombre,"Crear Trigger Update"))
+    {
+        return false;
+    }
+    //trigger para no insertar precio cero o negativo
+    sql_trigger_INSERT_precio = "CREATE TRIGGER IF NOT EXISTS Insert_Precio"
+                                " BEFORE INSERT ON Articulos"
+                                " FOR EACH ROW"
+                                " BEGIN"
+                                " SELECT CASE WHEN NEW.Precio <= 0 THEN"
+                                " RAISE(ABORT, 'Precio no puede ser cero o negativo')"
+                                " END;"
+                                " END;";
+    if (!SQL_EjecutarSentencia(db,sql_trigger_INSERT_precio,"Crear Trigger Insert Precio"))
+    {
+        return false;
+    }
+    //trigger para no actualizar precio cero o negativo
+    sql_trigger_UPDATE_precio = "CREATE TRIGGER IF NOT EXISTS Update_Precio"
+                                " BEFORE UPDATE OF Precio ON Articulos"
+                                " FOR EACH ROW"
+                                " BEGIN"
+                                " SELECT CASE WHEN NEW.Precio <= 0 THEN"
+                                " RAISE(ABORT, 'Precio no puede ser cero o negativo')"
+                                " END;"
+                                " END;";
+    if (!SQL_EjecutarSentencia(db,sql_trigger_UPDATE_precio,"Crear Trigger Update Precio"))
+    {
+        return false;
+    }
+    return true;
 }
 
 int CargarAriculo(sqlite3 *db, struct Articulo *input)
@@ -209,8 +267,12 @@ int main() {
     {
         return 1;
     }
-
-    InciarBase(db);
+    if (!InciarBase(db))
+    {
+        return 1;
+    }
+    
+    
     // Inicializar la ventana
     InitWindow(625, 400, "App Sqlite Raylib");
 
@@ -427,7 +489,7 @@ int main() {
             }
             
             //Editar
-            GuiGroupBox((Rectangle){310, 60, 300, 240}, "Editar/borrar");
+            GuiGroupBox((Rectangle){310, 60, 300, 140}, "Editar/borrar");
             if (GuiButton((Rectangle){390, 80, 200, 40}, "Editar") && !MensajeActivo) 
             {
                 if (consulatdo)
