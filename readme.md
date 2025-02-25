@@ -9,7 +9,7 @@ Este proyecto es una aplicación de escritorio que utiliza SQLite para la gesti�
 
 ## Uso
 
-1. Descarga la [Aplicacion](https://github.com/HernandezDev/ArticleDB/releases/download/1.0/ArticleDB_1.0.zip) y ejecita ArticleDB.exe
+1. Descarga la [Aplicacion](https://github.com/HernandezDev/ArticleDB/releases/download/1.0/ArticleDB_1.0.zip), Decomprime el Zip y ejecita ArticleDB.exe
 2. La aplicación tiene tres pestañas:
     - **Carga de artículos**: Permite ingresar nuevos artículos a la base de datos.
     - **Consulta por Id**: Permite consultar artículos por su ID, también editarlos o borrarlos.
