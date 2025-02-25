@@ -6,7 +6,7 @@
             "type": "shell",
             "command": "gcc",
             "args": [
-                "-g",
+                //"-g", // para debug
                 "-finput-charset=UTF-8",
                 "-fexec-charset=UTF-8", //utf-8 para ventanas
                 "-I", "C:/msys64/mingw64/include",
