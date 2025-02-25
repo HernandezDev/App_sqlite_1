@@ -276,6 +276,10 @@ int main() {
     // Inicializar la ventana
     InitWindow(625, 400, "ArticleDB");
 
+    // Cargar el icono de la ventana
+    Image icon = LoadImage("icon.png");  // Cargar la imagen del icono
+    SetWindowIcon(icon);                 // Establecer el icono de la ventana
+
     // Variables para el control de pestañas
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por Id;Listado Completo";
