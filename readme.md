@@ -28,6 +28,8 @@ Este proyecto es una aplicación de escritorio que utiliza SQLite para la gesti�
 - **Precio positivo**: No se permite insertar o actualizar un artículo con un precio de cero o negativo.
 - **Nombre único**: No se permite insertar un artículo con un nombre que ya exista en la base de datos.
 - **No repetición de IDs**: Los IDs de los artículos son únicos y no se reutilizan, incluso si un artículo es borrado.
+## Preview
+![Preview](https://github.com/HernandezDev/ArticleDB/blob/main/Preview/Preview.gif)
 
 ## Código Principal
 
