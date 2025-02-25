@@ -28,7 +28,20 @@ Este proyecto es una aplicación de escritorio que utiliza SQLite para la gesti�
 - **Precio positivo**: No se permite insertar o actualizar un artículo con un precio de cero o negativo.
 - **Nombre único**: No se permite insertar un artículo con un nombre que ya exista en la base de datos.
 - **No repetición de IDs**: Los IDs de los artículos son únicos y no se reutilizan, incluso si un artículo es borrado.
+
+## CRUD
+
+ArticleDB es una aplicación CRUD (Create, Read, Update, Delete) porque permite realizar las cuatro operaciones básicas de persistencia de datos:
+
+- **Create (Crear)**: Permite agregar nuevos artículos a la base de datos.
+- **Read (Leer)**: Permite consultar y listar los artículos almacenados en la base de datos.
+- **Update (Actualizar)**: Permite modificar los detalles de los artículos existentes.
+- **Delete (Eliminar)**: Permite eliminar artículos de la base de datos.
+
+Estas operaciones son fundamentales para la gestión de cualquier base de datos y son implementadas de manera eficiente en ArticleDB.
+
 ## Preview
+
 ![Preview](https://github.com/HernandezDev/ArticleDB/blob/main/Preview/Preview.gif)
 
 ## Código Principal
