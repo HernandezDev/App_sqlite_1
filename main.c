@@ -274,7 +274,7 @@ int main() {
     
     
     // Inicializar la ventana
-    InitWindow(625, 400, "App Sqlite Raylib");
+    InitWindow(625, 400, "ArticleDB");
 
     // Variables para el control de pestañas
     int currentTab = 0;

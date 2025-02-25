@@ -1,4 +1,4 @@
-# App Sqlite Raylib
+# ArticleDB
 
 Este proyecto es una aplicación de escritorio que utiliza SQLite para la gestión de una base de datos de artículos y Raylib para la interfaz gráfica de usuario.
 
