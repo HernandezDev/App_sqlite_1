@@ -116,6 +116,30 @@ int ConsultarAriculo(sqlite3 *db, struct Articulo *consulta)
     }
 }
 
+int EditarArticulo(sqlite3 *db, struct Articulo *consulta)
+{
+    sqlite3_stmt *stmt;
+    char *sql_update;
+    sql_update="UPDATE Articulos SET Nombre = ?, Precio = ? WHERE Id = ?;";
+    if (!SQL_PrepararSentencia(db,&stmt,sql_update))
+    {
+        return 2;
+    }
+    sqlite3_bind_text(stmt, 1, consulta->Nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 2, consulta->Precio);
+    sqlite3_bind_int(stmt, 3, consulta->Id);
+    if (sqlite3_step(stmt)!=SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+}
+
 int CantidadRows(sqlite3 *db)
 {
     int cantidad=0;
@@ -130,6 +154,8 @@ int CantidadRows(sqlite3 *db)
     sqlite3_finalize(stmt);
     return cantidad;
 }
+
+
 
 bool CargarLista(sqlite3 *db, struct Articulo *Lista)
 {
@@ -153,6 +179,7 @@ bool CargarLista(sqlite3 *db, struct Articulo *Lista)
     sqlite3_finalize(stmt);
     return true;
 }
+
 
 int main() {
     sqlite3 *db;
@@ -347,10 +374,32 @@ int main() {
             {
                 if (GuiButton((Rectangle){90, 230, 200, 40}, "Confirmar") && !MensajeActivo) 
                 {
-                    editMode = false;
-                    MensajeActivo=true;
-                    strcpy(titulo,"Editar"); strcpy(mensaje,"Articulo Editado");
-                    consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                    switch (EditarArticulo(db, &consulta))
+                    {
+                    case 0:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Editar"); strcpy(mensaje,"Articulo Editado");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                        editMode = false;
+                        //actualizar lista
+                        free(Lista);
+                        LargoLista=CantidadRows(db);
+                        Lista=malloc(LargoLista * sizeof(struct Articulo));
+                        CargarLista(db, Lista);
+                        break;
+                    case 1:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                        editMode = false;
+                        break;
+                    case 2:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                        editMode = false;
+                        break;
+                    }
                 }
             }
             
