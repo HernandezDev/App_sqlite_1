@@ -116,6 +116,52 @@ int ConsultarAriculo(sqlite3 *db, struct Articulo *consulta)
     }
 }
 
+int EditarArticulo(sqlite3 *db, struct Articulo *consulta)
+{
+    sqlite3_stmt *stmt;
+    char *sql_update;
+    sql_update="UPDATE Articulos SET Nombre = ?, Precio = ? WHERE Id = ?;";
+    if (!SQL_PrepararSentencia(db,&stmt,sql_update))
+    {
+        return 2;
+    }
+    sqlite3_bind_text(stmt, 1, consulta->Nombre, -1, SQLITE_STATIC);
+    sqlite3_bind_double(stmt, 2, consulta->Precio);
+    sqlite3_bind_int(stmt, 3, consulta->Id);
+    if (sqlite3_step(stmt)!=SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+}
+
+int BorrarArticulo(sqlite3 *db, struct Articulo *consulta)
+{
+    sqlite3_stmt *stmt;
+    char *sql_delete;
+    sql_delete="DELETE FROM Articulos WHERE Id = ?;";
+    if (!SQL_PrepararSentencia(db,&stmt,sql_delete))
+    {
+        return 2;
+    }
+    sqlite3_bind_int(stmt,1,consulta->Id);
+    if (sqlite3_step(stmt)!=SQLITE_DONE)
+    {
+        sqlite3_finalize(stmt);
+        return 1;
+    }
+    else
+    {
+        sqlite3_finalize(stmt);
+        return 0;
+    }
+}
+
 int CantidadRows(sqlite3 *db)
 {
     int cantidad=0;
@@ -130,6 +176,8 @@ int CantidadRows(sqlite3 *db)
     sqlite3_finalize(stmt);
     return cantidad;
 }
+
+
 
 bool CargarLista(sqlite3 *db, struct Articulo *Lista)
 {
@@ -154,6 +202,7 @@ bool CargarLista(sqlite3 *db, struct Articulo *Lista)
     return true;
 }
 
+
 int main() {
     sqlite3 *db;
     if (!SQL_AbrirBase(&db,"Base.db"))
@@ -168,6 +217,8 @@ int main() {
     // Variables para el control de pestañas
     int currentTab = 0;
     const char *tabNames = "Carga de artículos;Consulta por Id;Listado Completo";
+    bool editMode = false;
+    bool consulatdo = false;
     
     // Declarar struts para trasladar datos  (input) (consulta)
     struct Articulo input = {0,"","", 0.0f, ""};
@@ -181,6 +232,8 @@ int main() {
     bool EditInputNombreArticulo = false;
     bool EditInputPrecioArticulo = false;
     bool EditConsultaId = false;
+    bool EditConsultaNombre = false;
+    bool EditConsultaPrecio = false;
 
     //Arreglo de lista
     int LargoLista=CantidadRows(db);
@@ -207,6 +260,8 @@ int main() {
                 EditInputNombreArticulo = true;
                 EditInputPrecioArticulo = false;
                 EditConsultaId = false;
+                EditConsultaNombre = false;
+                EditConsultaPrecio = false;
             }
             // Verificar si se hizo clic en el campo de texto del precio del artículo
             else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 130, 200, 40}) && currentTab == 0)
@@ -214,18 +269,42 @@ int main() {
                 EditInputNombreArticulo = false;
                 EditInputPrecioArticulo = true;
                 EditConsultaId = false;
+                EditConsultaNombre = false;
+                EditConsultaPrecio = false;
             } 
-            else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 80, 200, 40}) && currentTab == 1)
+            else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 80, 200, 40}) && currentTab == 1 && !editMode)
             {
                 EditInputNombreArticulo = false;
                 EditInputPrecioArticulo = false;
                 EditConsultaId = true;
+                EditConsultaNombre = false;
+                EditConsultaPrecio = false;
+            }
+            
+            else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 130, 200, 40}) && currentTab == 1 && editMode)
+            {
+                EditInputNombreArticulo = false;
+                EditInputPrecioArticulo = false;
+                EditConsultaId = false;
+                EditConsultaNombre = true;
+                EditConsultaPrecio = false;
+            }
+            else if (CheckCollisionPointRec(mousePoint, (Rectangle){90, 180, 200, 40}) && currentTab == 1 && editMode)
+            {
+                EditInputNombreArticulo = false;
+                EditInputPrecioArticulo = false;
+                EditConsultaId = false;
+                EditConsultaNombre = false;
+                EditConsultaPrecio = true;
             }
             else 
             {
                 EditInputNombreArticulo = false;
                 EditInputPrecioArticulo = false;
                 EditConsultaId = false;
+                EditConsultaNombre = false;
+                EditConsultaPrecio = false;
+
             }
         }
 
@@ -284,29 +363,121 @@ int main() {
             GuiValueBox((Rectangle){90, 80, 200, 40}, consulta.IdStr,&consulta.Id,0,10000000,EditConsultaId);
             //nombre
             GuiLabel((Rectangle){25, 130, 200, 40}, "Nombre");
-            GuiTextBox((Rectangle){90, 130, 200, 40}, consulta.Nombre, 50, false);
+            GuiTextBox((Rectangle){90, 130, 200, 40}, consulta.Nombre, 50, EditConsultaNombre);
             //precio
             GuiLabel((Rectangle){25, 180, 200, 40}, "Precio");
-            GuiValueBoxFloat((Rectangle){90, 180, 200, 40}, "", consulta.PrecioStr, &consulta.Precio, false);
-            //Consultar
-            if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar") && !MensajeActivo) 
+            GuiValueBoxFloat((Rectangle){90, 180, 200, 40}, "", consulta.PrecioStr, &consulta.Precio, EditConsultaPrecio);
+            //Consultar / Confirmar
+            if (!editMode)
             {
-                
-                switch (ConsultarAriculo(db, &consulta))
+                if (GuiButton((Rectangle){90, 230, 200, 40}, "Consultar") && !MensajeActivo) 
                 {
-                case 1:
-                    MensajeActivo=true;
-                    strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
-                    consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
-                    break;
-                case 2:
-                    MensajeActivo=true;
-                    strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
-                    consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
-                    break;
+                
+                    switch (ConsultarAriculo(db, &consulta))
+                    {
+                    case 0:
+                        consulatdo = true;
+                        break;
+                    case 1:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                        break;
+                    case 2:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                        break;
+                    }
+                    snprintf(consulta.PrecioStr, sizeof(consulta.PrecioStr), "%.2f", consulta.Precio);
                 }
-                snprintf(consulta.PrecioStr, sizeof(consulta.PrecioStr), "%.2f", consulta.Precio);
             }
+            else
+            {
+                if (GuiButton((Rectangle){90, 230, 200, 40}, "Confirmar") && !MensajeActivo) 
+                {
+                    switch (EditarArticulo(db, &consulta))
+                    {
+                    case 0:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Editar"); strcpy(mensaje,"Articulo Editado");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                        editMode = false;
+                        //actualizar lista
+                        free(Lista);
+                        LargoLista=CantidadRows(db);
+                        Lista=malloc(LargoLista * sizeof(struct Articulo));
+                        CargarLista(db, Lista);
+                        break;
+                    case 1:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                        editMode = false;
+                        break;
+                    case 2:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                        editMode = false;
+                        break;
+                    }
+                    consulatdo = false;
+                }
+            }
+            
+            //Editar
+            GuiGroupBox((Rectangle){310, 60, 300, 240}, "Editar/borrar");
+            if (GuiButton((Rectangle){390, 80, 200, 40}, "Editar") && !MensajeActivo) 
+            {
+                if (consulatdo)
+                {
+                    editMode = true; 
+                }
+                else
+                {
+                    MensajeActivo=true;
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Consulte primero");
+                }
+                
+                
+            }
+            if (GuiButton((Rectangle){390, 130, 200, 40}, "Borrar") && !MensajeActivo) 
+            {
+                if (consulatdo)
+                {
+                    switch (BorrarArticulo(db, &consulta))
+                    {
+                    case 0:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Borrar"); strcpy(mensaje,"Articulo Borrado");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                        //actualizar lista
+                        free(Lista);
+                        LargoLista=CantidadRows(db);
+                        Lista=malloc(LargoLista * sizeof(struct Articulo));
+                        CargarLista(db, Lista);
+                        break;
+                    case 1:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Datos Invalidos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""}; 
+                        break;
+                    case 2:
+                        MensajeActivo=true;
+                        strcpy(titulo,"Error"); strcpy(mensaje,"Error en la base de datos");
+                        consulta =(struct Articulo){0, "", "", 0.0f, ""};
+                        break;
+                    }
+                    consulatdo = false;
+                }
+                else
+                {
+                    MensajeActivo=true;
+                    strcpy(titulo,"Error"); strcpy(mensaje,"Consulte primero");
+                }
+            }
+
         }
         else if (currentTab == 2) 
         {
