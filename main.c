@@ -349,7 +349,8 @@ int main() {
                 {
                     editMode = false;
                     MensajeActivo=true;
-                    strcpy(titulo,"Error"); strcpy(mensaje,"No se puede confirmar");
+                    strcpy(titulo,"Editar"); strcpy(mensaje,"Articulo Editado");
+                    consulta =(struct Articulo){0, "", "", 0.0f, ""};
                 }
             }
             
