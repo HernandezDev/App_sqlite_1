@@ -162,7 +162,7 @@ int ConsultarAriculo(sqlite3 *db, struct Articulo *consulta)
     sqlite3_bind_int(stmt,1,consulta->Id);
     if (sqlite3_step(stmt)==SQLITE_ROW)
     {
-        strcpy(consulta->Nombre,sqlite3_column_text(stmt, 1));
+        strcpy(consulta->Nombre, (const char*)sqlite3_column_text(stmt, 1));
         consulta->Precio=sqlite3_column_double(stmt, 2);
         sqlite3_finalize(stmt);
         return 0;
@@ -251,7 +251,7 @@ bool CargarLista(sqlite3 *db, struct Articulo *Lista)
     {
         Lista[i].Id=sqlite3_column_int(stmt, 0);
         sprintf(Lista[i].IdStr,"%d",Lista[i].Id);
-        strcpy(Lista[i].Nombre,sqlite3_column_text(stmt, 1));
+        strcpy(Lista[i].Nombre, (const char*)sqlite3_column_text(stmt, 1));
         Lista[i].Precio=sqlite3_column_double(stmt, 2);
         sprintf(Lista[i].PrecioStr,"%.2f",Lista[i].Precio);
         i++;

@@ -19,7 +19,9 @@
                 "-lgdi32",      //"ldd main.exe" o "ldd main.exe | grep lib"  para conocer todas las dependencias
                 "-lwinmm",
                 "-mwindows",// para que no abra la consola "-mwindows"
-                "-lsqlite3"
+                "-lsqlite3",
+                "-Wall", // Activa la mayoría de las advertencias comunes
+                
             ],
             "group": {
                 "kind": "build",
